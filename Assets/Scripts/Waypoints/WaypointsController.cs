@@ -44,14 +44,29 @@ public class WaypointsController : MonoBehaviour
         SetNextDirections();
     }
 
+    // private List<Waypoint> allWaypoints;
+    /// <summary>
+    /// コース上の全てのウェイポイント（Index順）
+    /// </summary>
+    // public List<Waypoint> AllWaypoints => allWaypoints; // ★追加：外部からアクセスできるようにする★
+
     public void SetNextDirections() {
+        // ウェイポイントのリストを AllWaypoints に格納する
+        // allWaypoints = GetComponentsInChildren<Waypoint>() // ★allWaypoints = ... に変更★
+        //                     .Where(x => x.transform != Prefab.transform)
+        //                     .Where(x => x.transform != transform)
+        //                     .OrderBy(x => x.Index)
+        //                     .ToList();
+        
         List<Waypoint> waypoints = GetComponentsInChildren<Waypoint>()
-                                   .Where(x => x.transform != Prefab.transform)
-                                   .Where(x => x.transform != transform)
-                                   .OrderBy(x => x.Index)
-                                   .ToList();
+                                     .Where(x => x.transform != Prefab.transform)
+                                     .Where(x => x.transform != transform)
+                                     .OrderBy(x => x.Index)
+                                     .ToList();
+
         for (int i = 0; i < waypoints.Count; i++) {
-            waypoints[i].SetNextDirection(waypoints[(i + 1) % waypoints.Count].transform.position);
+                // Waypoint.cs の SetNextDirection(Vector3 nextPosition) に戻す
+                waypoints[i].SetNextDirection(waypoints[(i + 1) % waypoints.Count].transform.position);
         }
     }
 

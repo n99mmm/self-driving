@@ -71,8 +71,16 @@ public class Waypoint : MonoBehaviour
 
         return (left, right);
     }
+    // private Waypoint nextWaypoint;
+    // /// <summary>
+    // /// コース上の次のウェイポイント
+    // /// </summary>
+    // public Waypoint NextWaypoint {
+    //     get { return nextWaypoint; }
+    //     private set { nextWaypoint = value; }
+    // }
 
-    public void SetNextDirection(Vector3 nextPosition) {
+    public void SetNextDirection(Vector3 nextPosition) { // ★引数を元に戻す★
         NextDirection = Vector3.Normalize(nextPosition - transform.position);
     }
 

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c33848f2d6586e4a9d56af4c3284faf, type: 3}
+  m_Name: New Fujita Battle Brain 1
+  m_EditorClassIdentifier: 
+  Name: Player 1
+  SensorAngleConfig: []
+  brainData: {fileID: 4900000, guid: a81f282868d3e2c4790c8153a4e8a62e, type: 3}
+  brain:
+    weights: []
+    biases: []
+    inputSize: 0
+    hiddenSize: 0
+    hiddenLayers: 0
+    outputSize: 0
+  selectedInputs: 01000100010100010001010001000100000000000000000000000000000000000000000000000000010101010101

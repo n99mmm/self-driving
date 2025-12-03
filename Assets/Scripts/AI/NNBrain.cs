@@ -6,6 +6,35 @@ using UnityEngine;
 using System;
 
 [Serializable]
+public class CheckpointRoot
+{
+    public int generation;
+    // JSONのキーに合わせて brainDataList の型を BrainData のリストにします
+    public List<BrainData> brainDataList = new List<BrainData>(); 
+}
+
+// NNBrainクラスの定義の上、またはクラス内に追加
+
+[Serializable]
+public struct BrainData
+{
+    // ネットワーク構造のパラメータ
+    public int inputSize;
+    public int hiddenSize;
+    public int hiddenLayers;
+    public int outputSize;
+    
+    // 重みとバイアスのデータ
+    // MatrixクラスがJsonUtilityで直接シリアライズ可能である必要があります。
+    // (Matrixクラスが[Serializable]であり、フィールドもシリアライズ可能であること)
+    public List<Matrix> weights;
+    public List<Matrix> biases;
+    
+    // その他の学習パラメータ
+    // NNBrainのMutationRateなどを保持したい場合はここに追加
+}
+
+[Serializable]
 public class NNBrain : Brain
 {
 
@@ -31,6 +60,46 @@ public class NNBrain : Brain
 
     [SerializeField] private int outputSize = 0;
     public int OutputSize { get { return outputSize; } private set { outputSize = value; } }
+
+    // NNBrainクラス内に追加します。
+
+    /// <summary>
+    /// NNBrainの状態をBrainDataとして取得します。
+    /// </summary>
+    public BrainData GetBrainData()
+    {
+        return new BrainData
+        {
+            inputSize = this.inputSize,
+            hiddenSize = this.hiddenSize,
+            hiddenLayers = this.hiddenLayers,
+            outputSize = this.outputSize,
+            // List<Matrix>の参照渡しではなく、値をコピーして格納することを推奨しますが、
+            // JsonUtilityによるシリアライズのために参照を渡します。
+            weights = this.weights,
+            biases = this.biases
+        };
+    }
+
+    /// <summary>
+    /// BrainDataからNNBrainの状態を復元します。
+    /// </summary>
+    public void SetBrainData(BrainData data)
+    {
+        // ネットワーク構造の復元
+        this.InputSize = data.inputSize;
+        this.HiddenSize = data.hiddenSize;
+        this.HiddenLayers = data.hiddenLayers;
+        this.OutputSize = data.outputSize;
+        
+        // 重みとバイアスの復元 (既存のリストをクリアしてから代入)
+        this.weights.Clear();
+        this.biases.Clear();
+        this.weights = data.weights;
+        this.biases = data.biases;
+    }   
+
+
 
     public double[] GetAction(List<double> observation) {
         if (observation.Count != InputSize) {
@@ -197,7 +266,37 @@ public class NNBrain : Brain
         File.WriteAllText(path, json);
     }
 
-    public static NNBrain Load(TextAsset asset) {
-        return JsonUtility.FromJson<NNBrain>(asset.text);
+    public static NNBrain Load(TextAsset asset)
+    {
+        string json = asset.text;
+        
+        // ★★★ 2. 修正後のロード処理 ★★★
+        try
+        {
+            // 1. JSON全体をルート構造（CheckpointRoot）としてデシリアライズ
+            CheckpointRoot checkpoint = JsonUtility.FromJson<CheckpointRoot>(json);
+
+            if (checkpoint == null || checkpoint.brainDataList == null || checkpoint.brainDataList.Count == 0)
+            {
+                Debug.LogError("❌ ロード失敗: JSONデータが空か、'brainDataList'が見つかりませんでした。");
+                return null;
+            }
+
+            // 2. brainDataListの最初の要素（BrainData）を取得
+            //    (バトルモードでは、リストの最初の要素がロード対象のBrainであると仮定)
+            BrainData data = checkpoint.brainDataList.First();
+
+            // 3. BrainDataを使用してNNBrainの新しいインスタンスを生成・設定
+            NNBrain newBrain = new NNBrain(data.inputSize, data.hiddenSize, data.hiddenLayers, data.outputSize);
+            newBrain.SetBrainData(data); // 重みとバイアスを設定
+
+            Debug.Log($"✅ NNBrainロード成功。InputSize: {newBrain.InputSize}");
+            return newBrain;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"❌ NNBrainのロード中に致命的なエラーが発生しました: {ex.Message}");
+            return null;
+        }
     }
 }
