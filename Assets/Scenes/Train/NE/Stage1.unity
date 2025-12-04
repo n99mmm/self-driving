@@ -11562,27 +11562,7 @@ MonoBehaviour:
   tournamentSelection: 85
   eliteSelection: 4
   selectedInputs: 01010101010001010100000101010000000000000000000000000000000000000000000000000000010101010101
-  sensorAngleConfig:
-  - 30
-  - 60
-  - 90
-  - 120
-  - 150
-  - 30
-  - 60
-  - 90
-  - 120
-  - 150
-  - 30
-  - 60
-  - 90
-  - 120
-  - 150
-  - 30
-  - 60
-  - 90
-  - 120
-  - 150
+  sensorAngleConfig: []
   hiddenSize: 12
   hiddenLayers: 1
   outputSize: 4
